@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/surfinggo/mc"
+	"os"
 	"time"
 )
 
 func PrintHeaders(c *gin.Context) {
-	if c.Request.Header.Get("X-Print-Headers") != "" {
+	if os.Getenv("X-Print-Headers") != "" || c.Request.Header.Get("X-Print-Headers") != "" {
 		fmt.Println()
 		fmt.Println("Headers:")
 		for k, v := range c.Request.Header {
@@ -26,7 +27,9 @@ func PrintHeaders(c *gin.Context) {
 }
 
 func FakeStatusCode(c *gin.Context) {
-	if code := mc.StringToInt(c.Request.Header.Get("X-Fake-Status-Code")); code != 0 {
+	codeHeader := mc.StringToInt(c.Request.Header.Get("X-Fake-Status-Code")) // higher priority
+	codeEnv := mc.StringToInt(os.Getenv("X-Fake-Status-Code"))
+	if code := mc.VarOr(codeHeader, codeEnv); code != 0 {
 		c.JSON(code, mc.VarOr(c.Request.Header.Get("X-Fake-Response"), "fake response"))
 		c.Abort()
 	} else {
@@ -35,8 +38,10 @@ func FakeStatusCode(c *gin.Context) {
 }
 
 func FakeResponseTime(c *gin.Context) {
-	if seconds := mc.StringToInt(c.Request.Header.Get("X-Fake-Response-Seconds")); seconds != 0 {
-		time.Sleep(time.Duration(seconds) * time.Second)
+	millisecondsHeader := mc.StringToInt(c.Request.Header.Get("X-Fake-Response-Milliseconds")) // higher priority
+	millisecondsEnv := mc.StringToInt(os.Getenv("X-Fake-Response-Milliseconds"))
+	if milliseconds := mc.VarOr(millisecondsHeader, millisecondsEnv); milliseconds != 0 {
+		time.Sleep(time.Duration(milliseconds) * time.Second)
 	}
 }
 

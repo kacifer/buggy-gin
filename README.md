@@ -28,4 +28,4 @@ Response body can also be faked by passing "X-Fake-Response: test" in request he
 
 ### FakeResponseTime
 
-Pass "X-Fake-Response-Seconds: 10" in request header to fake response time.
+Pass "X-Fake-Response-Milliseconds: 1000" in request header to fake response time.
