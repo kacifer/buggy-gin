@@ -9,7 +9,7 @@ import (
 )
 
 func PrintHeaders(c *gin.Context) {
-	if os.Getenv("X-Print-Headers") != "" || c.Request.Header.Get("X-Print-Headers") != "" {
+	if os.Getenv("PRINT_HEADERS") != "" || c.Request.Header.Get("X-Print-Headers") != "" {
 		fmt.Println()
 		fmt.Println("Headers:")
 		for k, v := range c.Request.Header {
@@ -28,7 +28,7 @@ func PrintHeaders(c *gin.Context) {
 
 func FakeStatusCode(c *gin.Context) {
 	codeHeader := mc.StringToInt(c.Request.Header.Get("X-Fake-Status-Code")) // higher priority
-	codeEnv := mc.StringToInt(os.Getenv("X-Fake-Status-Code"))
+	codeEnv := mc.StringToInt(os.Getenv("FAKE_STATUS_CODE"))
 	if code := mc.VarOr(codeHeader, codeEnv); code != 0 {
 		c.JSON(code, mc.VarOr(c.Request.Header.Get("X-Fake-Response"), "fake response"))
 		c.Abort()
@@ -39,7 +39,7 @@ func FakeStatusCode(c *gin.Context) {
 
 func FakeResponseTime(c *gin.Context) {
 	millisecondsHeader := mc.StringToInt(c.Request.Header.Get("X-Fake-Response-Milliseconds")) // higher priority
-	millisecondsEnv := mc.StringToInt(os.Getenv("X-Fake-Response-Milliseconds"))
+	millisecondsEnv := mc.StringToInt(os.Getenv("FAKE_RESPONSE_MILLISECONDS"))
 	if milliseconds := mc.VarOr(millisecondsHeader, millisecondsEnv); milliseconds != 0 {
 		time.Sleep(time.Duration(milliseconds) * time.Second)
 	}
